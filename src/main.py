@@ -1,4 +1,6 @@
-# main.py - Script chính để scrape papers
+# Script chính để chạy scraper
+# Bài tập lớn: Thu thập dữ liệu arXiv
+# Sinh viên: Phan Thành Nhựt
 # MSSV: 23127240
 
 import os
@@ -29,15 +31,18 @@ logger = logging.getLogger(__name__)
 
 
 class ArxivScraperPipeline:
+    """Class chính để quản lý quá trình scrape"""
     
     def __init__(self, output_dir: str, use_batch: bool = True):
         self.output_dir = output_dir
         self.use_batch = use_batch
         ensure_dir(output_dir)
         
+        # Khởi tạo các scraper
         self.arxiv_scraper = ArxivScraper(output_dir)
         
         if use_batch:
+            # Dùng batch scraper vì nhanh hơn nhiều
             self.reference_scraper = OptimizedReferenceScraper(batch_size=500)
             logger.info("Dùng batch reference scraper (nhanh hơn ~500 lần)")
         else:
@@ -46,8 +51,9 @@ class ArxivScraperPipeline:
         
         self.bibtex_generator = BibtexGenerator()
         
+        # Khởi tạo stats để tracking
         self.stats = {
-            'start_time': time.time(),  # Thêm start_time
+            'start_time': time.time(),
             'total_papers': 0,
             'successful_papers': 0,
             'failed_papers': 0,
@@ -414,64 +420,66 @@ class ArxivScraperPipeline:
         logger.info("="*60 + "\n")
     
     def print_batch_report(self, current_paper, total_papers):
-        """In báo cáo chi tiết mỗi 50 papers"""
-        logger.info("\n" + "="*80)
-        logger.info(f"📊 BÁO CÁO CHI TIẾT - ĐÃ XỬ LÝ {current_paper}/{total_papers} PAPERS")
-        logger.info("="*80)
+        """In báo cáo chi tiết mỗi 50 papers (theo yêu cầu đề bài Lab 1)"""
+        logger.info("\n" + "="*70)
+        logger.info(f"  BÁO CÁO TIẾN ĐỘ - Đã xử lý {current_paper}/{total_papers} papers")
+        logger.info("="*70)
         
-        # I. DATA STATISTICS
-        logger.info("\n╔════════════════════════════════════════════════════════════╗")
-        logger.info("║  I. CÁC SỐ LIỆU THỐNG KÊ VỀ DỮ LIỆU                     ║")
-        logger.info("╚════════════════════════════════════════════════════════════╝")
+        # Phần 1: Thống kê về dữ liệu
+        logger.info("\n>>> PHẦN I: THỐNG KÊ DỮ LIỆU <<<")
+        logger.info("-" * 70)
         
         success_rate = (self.stats['successful_papers'] / max(1, self.stats['successful_papers'] + self.stats['failed_papers'])) * 100
-        logger.info(f"\n1️⃣  Papers scraped successfully: {self.stats['successful_papers']}")
-        logger.info(f"2️⃣  Overall success rate: {success_rate:.2f}%")
+        logger.info(f"[1] Papers đã scrape thành công: {self.stats['successful_papers']}")
+        logger.info(f"[2] Tỉ lệ thành công: {success_rate:.2f}%")
         
+        # Tính size trung bình
         if self.stats['paper_sizes_before']:
             avg_before = sum(self.stats['paper_sizes_before']) / len(self.stats['paper_sizes_before'])
-            logger.info(f"3️⃣  Avg paper size BEFORE removing figures: {avg_before/1024/1024:.3f} MB")
+            logger.info(f"[3] Kích thước TB TRƯỚC khi xóa hình: {avg_before/1024:.2f} KB")
         
         if self.stats['paper_sizes_after']:
             avg_after = sum(self.stats['paper_sizes_after']) / len(self.stats['paper_sizes_after'])
-            logger.info(f"4️⃣  Avg paper size AFTER removing figures: {avg_after/1024/1024:.3f} MB")
+            logger.info(f"[4] Kích thước TB SAU khi xóa hình: {avg_after/1024:.2f} KB")
         
+        # References
         if self.stats['reference_counts']:
             avg_refs = sum(self.stats['reference_counts']) / len(self.stats['reference_counts'])
-            logger.info(f"5️⃣  Avg references per paper: {avg_refs:.2f}")
+            logger.info(f"[5] Số references trung bình: {avg_refs:.1f}")
         
         if self.stats['reference_counts'] and self.stats['reference_success_counts']:
             total_refs = sum(self.stats['reference_counts'])
             total_success = sum(self.stats['reference_success_counts'])
             ref_rate = (total_success / max(1, total_refs)) * 100
-            logger.info(f"6️⃣  Reference metadata success rate: {ref_rate:.2f}%")
+            logger.info(f"[6] Tỉ lệ lấy được metadata references: {ref_rate:.2f}%")
         
-        # II. SCRAPER PERFORMANCE
-        logger.info("\n╔════════════════════════════════════════════════════════════╗")
-        logger.info("║  II. HIỆU NĂNG CỦA BỘ CÀO                                ║")
-        logger.info("╚════════════════════════════════════════════════════════════╝")
+        # Phần 2: Hiệu năng
+        logger.info("\n>>> PHẦN II: HIỆU NĂNG SCRAPER <<<")
+        logger.info("-" * 70)
         
-        logger.info("\n📍 A. THỜI GIAN CHẠY")
+        # Thời gian
+        logger.info("A. Thời gian:")
         elapsed = time.time() - self.stats.get('start_time', time.time())
-        logger.info(f"8️⃣  Total wall time (so far): {elapsed/3600:.2f} hours ({elapsed:.1f}s)")
+        logger.info(f"  [8] Tổng thời gian chạy: {elapsed/60:.1f} phút")
         
         if self.stats['paper_runtimes']:
             avg_time = sum(self.stats['paper_runtimes']) / len(self.stats['paper_runtimes'])
-            logger.info(f"9️⃣  Avg time per paper: {avg_time:.2f}s")
+            logger.info(f"  [9] Thời gian TB mỗi paper: {avg_time:.1f}s")
         
-        logger.info("\n📍 B. BỘ NHỚ")
-        logger.info(f"1️⃣2️⃣ Max RAM used: {self.stats['max_ram_mb']:.2f} MB ({self.stats['max_ram_mb']/1024:.3f} GB)")
+        # Bộ nhớ
+        logger.info("\nB. Bộ nhớ:")
+        logger.info(f"  [12] RAM tối đa: {self.stats['max_ram_mb']:.1f} MB")
         
         if self.stats['ram_samples']:
             current_avg = sum(self.stats['ram_samples']) / len(self.stats['ram_samples'])
-            logger.info(f"1️⃣5️⃣ Avg RAM consumption: {current_avg:.2f} MB ({current_avg/1024:.3f} GB)")
+            logger.info(f"  [15] RAM trung bình: {current_avg:.1f} MB")
         
         if os.path.exists(self.output_dir):
             disk_mb = get_directory_size(self.output_dir) / (1024 * 1024)
-            logger.info(f"1️⃣3️⃣ Current disk storage: {disk_mb:.2f} MB ({disk_mb/1024:.3f} GB)")
+            logger.info(f"  [13] Dung lượng hiện tại: {disk_mb:.1f} MB")
         
-        logger.info("\n" + "="*80)
-        logger.info(f"✅ Tiếp tục scraping... ({total_papers - current_paper} papers còn lại)")
+        logger.info("\n" + "="*70)
+        logger.info(f"Còn lại {total_papers - current_paper} papers nữa...\n")
         logger.info("="*80 + "\n")
     
     def cleanup_all_temp_files(self):

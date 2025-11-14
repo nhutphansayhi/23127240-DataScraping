@@ -1,22 +1,22 @@
-# arXiv Paper Scraper - Lab 1
+# Bài Tập Lớn: Thu Thập Dữ Liệu từ arXiv
 
-Đây là bài Lab 1 của mình (MSSV: 23127240) môn Nhập môn Khoa học Dữ liệu.
+Em làm bài Lab 1 môn Nhập môn Khoa học Dữ liệu.
 
-## Thông tin bài tập
-
+**Sinh viên:** Phan Thành Nhựt  
 **MSSV:** 23127240  
-**Paper range:** 2311.14685 đến 2312.00844 (5000 papers)  
-**Môn:** Introduction to Data Science - Lab 1
+**Lớp:** Nhập môn Khoa học Dữ liệu  
 
-## Chức năng chính
+**Phạm vi scrape:** 5000 papers từ 2311.14685 đến 2312.00844
 
-Project này scrape papers từ arXiv bao gồm:
-- Download full TeX source (tất cả versions: v1, v2, v3...)
-- Xóa figures trong TeX files
-- Tạo metadata file (JSON)
-- Tạo BibTeX references
-- Crawl citations từ Semantic Scholar API
-- Filter chỉ lấy references có arXiv ID
+## Mô tả
+
+Bài này em làm scraper để tự động tải papers từ arXiv, bao gồm:
+- Tải source code TeX (cả các version khác nhau: v1, v2, v3...)
+- Xóa hình ảnh trong file TeX để giảm dung lượng
+- Lưu thông tin metadata dạng JSON
+- Tạo file BibTeX cho references
+- Lấy thông tin citations từ Semantic Scholar
+- Chỉ giữ lại references có arXiv ID
 
 ## Cách chạy
 
@@ -50,38 +50,38 @@ Project này scrape papers từ arXiv bao gồm:
    pip install -r requirements.txt
    ```
 
-## Chạy scraper
+## Cách chạy
 
-### Chạy cơ bản
+### Chạy scraper
 
 ```bash
+cd src
 python main.py
 ```
 
-Sẽ scrape từ 2311.14685 đến 2312.00844 (config mặc định).
+Mặc định sẽ chạy từ 2311.14685 đến 2312.00844 (theo config).
 
-### Tùy chỉnh range
+### Chạy với range tùy chỉnh
 
 ```bash
-python main.py --start-ym 2311 --start-id 14685 --end-ym 2312 --end-id 843
+python main.py --start-ym 2311 --start-id 14685 --end-ym 2311 --end-id 14700
 ```
 
-### Arguments
+**Các tham số:**
+- `--start-ym`: Tháng bắt đầu (dạng YYMM, ví dụ: 2311)
+- `--start-id`: Số ID bắt đầu
+- `--end-ym`: Tháng kết thúc
+- `--end-id`: Số ID kết thúc
+- `--output`: Folder lưu kết quả (mặc định là `../23127240_data`)
 
-- `--start-ym`: Tháng bắt đầu (YYMM, vd: "2311")
-- `--start-id`: ID bắt đầu (vd: 14685)
-- `--end-ym`: Tháng kết thúc (YYMM, vd: "2312")
-- `--end-id`: ID kết thúc (vd: 843)
-- `--output`: Thư mục output (mặc định: `../23127240_data`)
-
-### Ví dụ
+**Ví dụ:**
 
 ```bash
-# Chạy full
+# Chạy toàn bộ 5000 papers
 python main.py
 
-# Chạy 1 range nhỏ
-python main.py --start-ym 2311 --start-id 14685 --end-ym 2311 --end-id 14690
+# Test với vài papers đầu
+python main.py --start-id 14685 --end-id 14690
 ```
 
 ## Output Structure

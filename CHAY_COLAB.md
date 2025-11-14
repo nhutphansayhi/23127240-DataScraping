@@ -1,39 +1,43 @@
-# 🚀 Hướng Dẫn Chạy Trên Google Colab
+# Hướng Dẫn Chạy Code Trên Google Colab
 
-## Bước 1: Mở Google Colab
-Vào: https://colab.research.google.com/
+Vì máy cá nhân không đủ mạnh nên em chạy trên Colab cho nhanh.
 
-## Bước 2: Tạo Notebook Mới & Copy Code
+## Bước 1: Mở Colab
+Vào trang: https://colab.research.google.com/
 
-### Cell 1: Clone Repository
+## Bước 2: Tạo Notebook mới và copy code dưới đây
+
+### Cell 1: Clone code từ GitHub về
 ```python
 !git clone https://github.com/nhutphansayhi/23127240-DataScraping.git
 %cd 23127240-DataScraping/src
 ```
 
-### Cell 2: Cài Đặt Packages
+### Cell 2: Cài thư viện cần thiết
 ```python
 !pip install requests arxiv bibtexparser psutil feedparser
 ```
 
-### Cell 3: Chạy Scraper (Test 55 Papers - Sẽ Thấy Batch Report Ở Paper 50)
+### Cell 3: Chạy scraper
+
+**Test với 55 papers (để xem báo cáo ở paper thứ 50):**
 ```python
 !python main.py --start-id 14685 --end-id 14739
 ```
 
-**HOẶC** chạy đủ 5000 papers:
+**Hoặc chạy luôn cả 5000 papers (mất ~14-20 giờ):**
 ```python
 !python main.py
 ```
 
-## 📊 Xem Kết Quả
+## Xem kết quả
 
-### Cell 4: Xem Stats
+### Cell 4: Xem thống kê
 ```python
 import json
 with open('../23127240_data/scraping_stats.json') as f:
-    stats = json.load(f)
-    print(json.dumps(stats, indent=2))
+    data = json.load(f)
+    print(json.dumps(data, indent=2))
 ```
 
 ### Cell 5: Xem Paper Details CSV
