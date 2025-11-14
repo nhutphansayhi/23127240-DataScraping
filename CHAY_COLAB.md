@@ -56,16 +56,25 @@ from google.colab import files
 files.download('../23127240_results.zip')
 ```
 
-## ⚡ Lưu Ý Quan Trọng:
+## ⚡ Lưu ý quan trọng:
 
-1. **Runtime**: Chọn `Runtime > Change runtime type > T4 GPU` (nhanh hơn, miễn phí)
-2. **Batch Report**: Code sẽ in báo cáo 15 metrics **MỖI 50 PAPERS** 
-3. **Checkpoint**: Nếu bị ngắt, chạy lại Cell 3 - nó sẽ tự động skip papers đã scrape
-4. **Time Limit**: Colab free chỉ chạy 12h liên tục. Với 5000 papers (~10-15s/paper) cần ~14-20 giờ
-   - Nên chạy từng batch: 
-     - Batch 1: `--start-id 14685 --end-id 14934` (250 papers)
-     - Batch 2: `--start-id 14935 --end-id 15184` (250 papers)
-     - ...
+1. **Chọn Runtime tốt hơn**: `Runtime > Change runtime type > T4 GPU` (miễn phí và nhanh)
+2. **Báo cáo tự động**: Code sẽ in báo cáo 15 metrics **MỖI 50 PAPERS**
+3. **Tự động resume**: Nếu bị ngắt giữa chừng, chạy lại Cell 3 - nó sẽ tự skip papers đã scrape xong
+4. **Thời gian**: 
+   - Code dùng batch scraper (6 luồng) nên **~8-10 giây/paper**
+   - 5000 papers = **~11-14 giờ** (Colab free giới hạn 12h)
+   - **Nên chạy từng batch ~3-4 giờ:**
+     ```python
+     # Batch 1: ~1500 papers (~3-4h)
+     !python main.py --start-id 14685 --end-id 16184
+     
+     # Batch 2: ~1500 papers (~3-4h) 
+     !python main.py --start-id 16185 --end-id 17684
+     
+     # Batch 3: ~2000 papers còn lại (~4-5h)
+     !python main.py --start-id 17685 --end-id 844
+     ```
 
 ## 📝 Ví Dụ Batch Report Mỗi 50 Papers:
 
